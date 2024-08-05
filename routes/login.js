@@ -29,9 +29,17 @@ class Client {
     catch(error){
         console.error('Connection failed:', error);
         throw error; // Rethrow the error to handle it outside the class
-    }      
+    }    
+       
       
     }
+
+
+async closeConnection(){
+    if(this.dbs){
+        await this.client.close();
+    }
+}
 
 
    async insertFunc(data){
@@ -42,30 +50,27 @@ class Client {
     }catch{
         console.log(error)
     }finally{
-        await this.dbs.close();
+        await this.closeConnection();
     }
    }
 
 
 
-   async deleteFunc(data){
+   async deleteFunc(query){
     try{
         await this.connection();
-        await this.table.deleteMany(data);
+        await this.table.deleteMany(query);
 
     }catch(error){
         console.log(error);
     }
     finally{
-        await this.dbs.close();
+       await this.closeConnection();
     }
    }
     
 }
 
-const client = new Client(url,'my_test','test');
-
-client.deleteFunc({phone:55454564});
 
 
 
@@ -78,6 +83,10 @@ res.render('login',{title:"Login" ,link:about_style,scripts:about_script});
 router.post('/',async (req,res,next)=>{
     let username = req.body.username;
     let password = req.body.password;
-    res.send("Inserted to db");
+    const client = new Client(url,'my_test','test');
+    //client.insertFunc({username,password});
+    client.insertFunc({username}).then(()=>{
+        res.send("Inserted");
+    }).catch(error=>error);
 });
 module.exports=router;
