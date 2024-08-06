@@ -85,8 +85,10 @@ router.post('/',async (req,res,next)=>{
     let password = req.body.password;
     const client = new Client(url,'my_test','test');
     //client.insertFunc({username,password});
-    client.insertFunc({username}).then(()=>{
+    await client.insertFunc({username}).then(()=>{
         res.send("Inserted");
     }).catch(error=>error);
 });
+
+
 module.exports=router;
